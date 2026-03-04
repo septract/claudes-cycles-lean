@@ -13,6 +13,7 @@ namespace ClaudesCycles
 
 variable (m : ℕ) [NeZero m]
 
+omit [NeZero m] in
 /-- After n steps, the fiber advances by n. -/
 theorem iterate_fiber (c : Fin 3) (v : Vertex m) (n : ℕ) :
     fiber m ((step m c)^[n] v) = fiber m v + n := by
@@ -23,12 +24,14 @@ theorem iterate_fiber (c : Fin 3) (v : Vertex m) (n : ℕ) :
     push_cast
     ring
 
+omit [NeZero m] in
 /-- After m steps, the fiber returns to its original value. -/
 theorem iterate_m_fiber (c : Fin 3) (v : Vertex m) :
     fiber m ((step m c)^[m] v) = fiber m v := by
   rw [iterate_fiber]
   simp
 
+omit [NeZero m] in
 /-- Two orbit points with the same fiber differ by a multiple of m steps. -/
 theorem fiber_eq_of_iterate (c : Fin 3) (v : Vertex m) {a b : ℕ}
     (h : fiber m ((step m c)^[a] v) = fiber m ((step m c)^[b] v)) :
@@ -70,6 +73,7 @@ theorem IsHamiltonian.surj_orbit {f : Vertex m → Vertex m} (hf : IsHamiltonian
   obtain ⟨n, rfl⟩ := hsurj w
   exact ⟨n.val, n.isLt, rfl⟩
 
+omit [NeZero m] in
 /-- Key arithmetic lemma: in ZMod m with m odd, adding 2 generates all of ZMod m.
   More precisely, the additive order of 2 in ZMod m equals m when m is odd. -/
 theorem ZMod.addOrderOf_two (hm : Odd m) (hm1 : 1 < m) :

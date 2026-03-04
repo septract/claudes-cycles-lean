@@ -21,30 +21,35 @@ variable (m : ℕ) [NeZero m]
 
 /-! ## Direction lemmas for cycle 2 -/
 
+omit [NeZero m] in
 /-- At s = 0, j ≠ -1: cycle 2 bumps i. -/
 theorem direction_two_s0_j_ne (v : Vertex m)
     (hs : fiber m v = 0) (hj : v.2.1 ≠ -1) :
     direction m 2 v = 0 := by
   simp only [direction, hs, ↓reduceIte, if_pos hj]
 
+omit [NeZero m] in
 /-- At s = 0, j = -1: cycle 2 bumps k. -/
 theorem direction_two_s0_j_neg (v : Vertex m)
     (hs : fiber m v = 0) (hj : v.2.1 = -1) :
     direction m 2 v = 2 := by
-  simp only [direction, hs, ↓reduceIte, hj, ne_eq, not_true_eq_false, if_neg]
+  simp only [direction, hs, ↓reduceIte, hj, ne_eq, not_true_eq_false]
 
+omit [NeZero m] in
 /-- At 0 < s < m-1, i ≠ -1: cycle 2 bumps k. -/
 theorem direction_two_mid_i_ne (v : Vertex m)
     (hs0 : fiber m v ≠ 0) (hsm : fiber m v ≠ -1) (hi : v.1 ≠ -1) :
     direction m 2 v = 2 := by
   simp only [direction, hs0, hsm, ↓reduceIte, if_pos hi]
 
+omit [NeZero m] in
 /-- At 0 < s < m-1, i = -1: cycle 2 bumps j. -/
 theorem direction_two_mid_i_neg (v : Vertex m)
     (hs0 : fiber m v ≠ 0) (hsm : fiber m v ≠ -1) (hi : v.1 = -1) :
     direction m 2 v = 1 := by
-  simp only [direction, hs0, hsm, ↓reduceIte, hi, ne_eq, not_true_eq_false, if_neg]
+  simp only [direction, hs0, hsm, ↓reduceIte, hi, ne_eq, not_true_eq_false]
 
+omit [NeZero m] in
 /-- At s = -1: cycle 2 bumps i. -/
 theorem direction_two_sm (v : Vertex m)
     (hs0 : fiber m v ≠ 0) (hsm : fiber m v = -1) :

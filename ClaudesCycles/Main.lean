@@ -22,6 +22,7 @@ theorem all_cycles_hamiltonian (hm : Odd m) (hm3 : 3 ≤ m) :
    cycle1_hamiltonian m hm hm3,
    cycle2_hamiltonian m hm hm3⟩
 
+omit [NeZero m] in
 /-- The three cycles partition all arcs: at each vertex, they bump
     distinct coordinates (since direction is a bijection Fin 3 → Fin 3). -/
 theorem arcs_partitioned (v : Vertex m) :

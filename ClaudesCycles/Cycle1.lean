@@ -19,24 +19,28 @@ variable (m : ℕ) [NeZero m]
 
 /-! ## Direction lemmas for cycle 1 -/
 
+omit [NeZero m] in
 /-- At s = 0: cycle 1 always bumps j. -/
 theorem direction_one_s0 (v : Vertex m)
     (hs : fiber m v = 0) :
     direction m 1 v = 1 := by
   simp only [direction, hs, ↓reduceIte]
 
+omit [NeZero m] in
 /-- At 0 < s < m-1: cycle 1 always bumps i. -/
 theorem direction_one_mid (v : Vertex m)
     (hs0 : fiber m v ≠ 0) (hsm : fiber m v ≠ -1) :
     direction m 1 v = 0 := by
   simp only [direction, hs0, hsm, ↓reduceIte]
 
+omit [NeZero m] in
 /-- At s = -1, i ≠ 0: cycle 1 bumps k. -/
 theorem direction_one_sm_i_ne (v : Vertex m)
     (hs0 : fiber m v ≠ 0) (hsm : fiber m v = -1) (hi : v.1 ≠ 0) :
     direction m 1 v = 2 := by
   simp only [direction]; split_ifs <;> simp_all
 
+omit [NeZero m] in
 /-- At s = -1, i = 0: cycle 1 bumps j. -/
 theorem direction_one_sm_i0 (v : Vertex m)
     (hs0 : fiber m v ≠ 0) (hsm : fiber m v = -1) (hi : v.1 = 0) :

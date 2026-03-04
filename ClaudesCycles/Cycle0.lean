@@ -22,40 +22,45 @@ namespace ClaudesCycles
 
 variable (m : ℕ) [NeZero m]
 
-set_option linter.unusedSectionVars false in
 /-! ## Direction lemmas for cycle 0 -/
 section DirectionLemmas
 
+omit [NeZero m] in
 /-- At s = 0, j = -1: cycle 0 bumps coordinate 0 (i). -/
 theorem direction_zero_s0_j_neg (v : Vertex m)
     (hs : fiber m v = 0) (hj : v.2.1 = -1) :
     direction m 0 v = 0 := by
   simp only [direction, hs, hj, ↓reduceIte]
 
+omit [NeZero m] in
 /-- At s = 0, j ≠ -1: cycle 0 bumps coordinate 2 (k). -/
 theorem direction_zero_s0_j_ne (v : Vertex m)
     (hs : fiber m v = 0) (hj : v.2.1 ≠ -1) :
     direction m 0 v = 2 := by
   simp only [direction, hs, ↓reduceIte, hj]
 
+omit [NeZero m] in
 /-- At 0 < s < m-1 (s ≠ 0 ∧ s ≠ -1), i = -1: cycle 0 bumps k. -/
 theorem direction_zero_mid_i_neg (v : Vertex m)
     (hs0 : fiber m v ≠ 0) (hsm : fiber m v ≠ -1) (hi : v.1 = -1) :
     direction m 0 v = 2 := by
   simp only [direction, hs0, hsm, hi, ↓reduceIte]
 
+omit [NeZero m] in
 /-- At 0 < s < m-1 (s ≠ 0 ∧ s ≠ -1), i ≠ -1: cycle 0 bumps j. -/
 theorem direction_zero_mid_i_ne (v : Vertex m)
     (hs0 : fiber m v ≠ 0) (hsm : fiber m v ≠ -1) (hi : v.1 ≠ -1) :
     direction m 0 v = 1 := by
   simp only [direction, hs0, hsm, hi, ↓reduceIte]
 
+omit [NeZero m] in
 /-- At s = -1, i ≠ 0: cycle 0 bumps j. -/
 theorem direction_zero_sm_i_ne (v : Vertex m)
     (hs0 : fiber m v ≠ 0) (hsm : fiber m v = -1) (hi : v.1 ≠ 0) :
     direction m 0 v = 1 := by
   simp only [direction]; split_ifs <;> simp_all
 
+omit [NeZero m] in
 /-- At s = -1, i = 0: cycle 0 bumps k. -/
 theorem direction_zero_sm_i0 (v : Vertex m)
     (hs0 : fiber m v ≠ 0) (hsm : fiber m v = -1) (hi : v.1 = 0) :
@@ -66,6 +71,7 @@ end DirectionLemmas
 
 /-! ## i-stability: i changes only at s = 0 with j = -1 -/
 
+omit [NeZero m] in
 /-- step 0 preserves the first coordinate unless s = 0 ∧ j = -1. -/
 theorem step_zero_preserves_i (v : Vertex m)
     (h : ¬(fiber m v = 0 ∧ v.2.1 = -1)) :
@@ -81,6 +87,7 @@ theorem step_zero_preserves_i (v : Vertex m)
       · simp only [step, direction_zero_mid_i_neg m v hs0 hsm hi, bump]
       · simp only [step, direction_zero_mid_i_ne m v hs0 hsm hi, bump]
 
+omit [NeZero m] in
 /-- At s = 0 with j = -1, step 0 increments i. -/
 theorem step_zero_bumps_i (v : Vertex m)
     (hs : fiber m v = 0) (hj : v.2.1 = -1) :
@@ -89,6 +96,7 @@ theorem step_zero_bumps_i (v : Vertex m)
 
 /-! ## Helper: nonzero cast -/
 
+omit [NeZero m] in
 theorem natCast_ne_zero_of_lt (n : ℕ) (hn0 : 0 < n) (hnm : n < m) :
     (n : ZMod m) ≠ 0 := by
   intro h; rw [ZMod.natCast_eq_zero_iff] at h
@@ -96,6 +104,7 @@ theorem natCast_ne_zero_of_lt (n : ℕ) (hn0 : 0 < n) (hnm : n < m) :
 
 /-! ## i-preservation over m steps -/
 
+omit [NeZero m] in
 /-- i is preserved over n steps (0 ≤ n ≤ m) from an s=0 vertex with j ≠ -1. -/
 theorem iterate_preserves_i (v : Vertex m) (_hm : 1 < m)
     (hs : fiber m v = 0) (hj : v.2.1 ≠ -1) (n : ℕ) (hn : n ≤ m) :
@@ -111,9 +120,10 @@ theorem iterate_preserves_i (v : Vertex m) (_hm : 1 < m)
     intro ⟨hfib, hjk⟩
     rw [iterate_fiber, hs, zero_add] at hfib
     by_cases hk0 : k = 0
-    · subst hk0; simp at hjk; exact hj hjk
+    · subst hk0; simp only [Function.iterate_zero, id_eq] at hjk; exact hj hjk
     · exact absurd hfib (natCast_ne_zero_of_lt m k (Nat.pos_of_ne_zero hk0) hk)
 
+omit [NeZero m] in
 /-- After m steps from s=0 with i ≠ -1, j ≠ -1: i is preserved. -/
 theorem m_step_preserves_i (v : Vertex m) (hm : 1 < m)
     (hs : fiber m v = 0) (_hi : v.1 ≠ -1) (hj : v.2.1 ≠ -1) :
@@ -138,18 +148,21 @@ For steps 2..m-1, the vertex at iterate n (1 ≤ n ≤ m-2) from s=0 with i≠-1
   (i, j + n - 1, k + 1) with fiber = n.
 Step 1 bumps k (s=0), steps 2..m-1 bump j (mid fiber), step m depends on i. -/
 
+omit [NeZero m] in
 /-- After step 1 from s=0, j≠-1: the vertex is (i, j, k+1) with fiber 1. -/
 theorem step1_from_s0 (v : Vertex m)
     (hs : fiber m v = 0) (hj : v.2.1 ≠ -1) :
     step m 0 v = (v.1, v.2.1, v.2.2 + 1) := by
   simp only [step, direction_zero_s0_j_ne m v hs hj, bump]
 
+omit [NeZero m] in
 /-- At mid fiber with i≠-1, step bumps j only: (i, j+1, k) -/
 theorem step_mid (v : Vertex m)
     (hs0 : fiber m v ≠ 0) (hsm : fiber m v ≠ -1) (hi : v.1 ≠ -1) :
     step m 0 v = (v.1, v.2.1 + 1, v.2.2) := by
   simp only [step, direction_zero_mid_i_ne m v hs0 hsm hi, bump]
 
+omit [NeZero m] in
 /-- After n mid-fiber steps (from fiber=1, i≠-1), the vertex is
     (i, j+n, k) with fiber 1+n. -/
 theorem iterate_mid (v : Vertex m) (hm3 : 3 ≤ m)
@@ -162,7 +175,7 @@ theorem iterate_mid (v : Vertex m) (hm3 : 3 ≤ m)
     have hk : k < m - 2 := Nat.lt_of_succ_le hn
     rw [Function.iterate_succ_apply', ih (le_of_lt hk)]
     have hfib_k : fiber m (v.1, v.2.1 + ↑k, v.2.2) = 1 + (k : ZMod m) := by
-      simp only [fiber]; rw [← hfib]; simp [fiber]; push_cast; ring
+      simp only [fiber]; rw [← hfib]; simp [fiber]; ring
     have hne0 : 1 + (k : ZMod m) ≠ 0 := by
       have := natCast_ne_zero_of_lt m (1 + k) (by omega) (by omega)
       push_cast at this; exact this
@@ -180,6 +193,7 @@ theorem iterate_mid (v : Vertex m) (hm3 : 3 ≤ m)
     simp only [Prod.mk.injEq, true_and, and_true]
     push_cast; ring
 
+omit [NeZero m] in
 /-- 0 ≠ -1 in ZMod m when m ≥ 2. -/
 theorem zero_ne_neg_one (hm : 2 ≤ m) : (0 : ZMod m) ≠ -1 := by
   intro h
@@ -190,10 +204,12 @@ theorem zero_ne_neg_one (hm : 2 ≤ m) : (0 : ZMod m) ≠ -1 := by
   rw [ZMod.natCast_eq_zero_iff] at h2
   exact absurd (Nat.le_of_dvd (by omega) h2) (by omega)
 
+omit [NeZero m] in
 /-- -1 ≠ 0 in ZMod m when m ≥ 2. -/
 theorem neg_one_ne_zero (hm : 2 ≤ m) : (-1 : ZMod m) ≠ 0 :=
   Ne.symm (zero_ne_neg_one m hm)
 
+omit [NeZero m] in
 /-- Cast of (m - k) to ZMod m equals -k when k ≤ m. -/
 theorem natCast_sub_eq_neg (k : ℕ) (hk : k ≤ m) :
     ((m - k : ℕ) : ZMod m) = -(k : ZMod m) :=
@@ -202,6 +218,7 @@ theorem natCast_sub_eq_neg (k : ℕ) (hk : k ≤ m) :
     have : ((m - k + k : ℕ) : ZMod m) = 0 := by rw [h]; exact ZMod.natCast_self m
     push_cast at this; exact this)
 
+omit [NeZero m] in
 /-- Full m-step formula, i=0 case. From (0, j, k) with s=0, j≠-1:
     after m steps → (0, j+(m-2), k+2). -/
 theorem m_step_i0 (v : Vertex m) (hm3 : 3 ≤ m)
@@ -225,21 +242,25 @@ theorem m_step_i0 (v : Vertex m) (hm3 : 3 ≤ m)
   have hne0 : fiber m (v.1, v.2.1 + ↑(m - 2), v.2.2 + 1) ≠ 0 := by
     rw [hfib_last]; exact neg_one_ne_zero m (by omega)
   rw [step, direction_zero_sm_i0 m _ hne0 hfib_last hi, bump]
-  simp only [Prod.mk.injEq, true_and, and_true]; push_cast; ring
+  simp only [Prod.mk.injEq, true_and]; ring
 
+omit [NeZero m] in
 /-- For i = 0: after m steps from s=0, k advances by 2. -/
 theorem m_step_k_advance_i0 (v : Vertex m) (hm3 : 3 ≤ m)
     (hs : fiber m v = 0) (hi : v.1 = 0) (hj : v.2.1 ≠ -1) :
     ((step m 0)^[m] v).2.2 = v.2.2 + 2 := by
   rw [m_step_i0 m v hm3 hs hi hj]
 
+omit [NeZero m] in
 /-- For i = 0: after m steps from s=0, j retreats by 2. -/
 theorem m_step_j_retreat_i0 (v : Vertex m) (hm3 : 3 ≤ m)
     (hs : fiber m v = 0) (hi : v.1 = 0) (hj : v.2.1 ≠ -1) :
     ((step m 0)^[m] v).2.1 = v.2.1 - 2 := by
-  rw [m_step_i0 m v hm3 hs hi hj]; simp
+  rw [m_step_i0 m v hm3 hs hi hj]
+  change v.2.1 + ↑(m - 2) = v.2.1 - 2
   rw [natCast_sub_eq_neg m 2 (by omega)]; ring
 
+omit [NeZero m] in
 /-- Full m-step formula, 0<i<m-1 case. From (i, j, k) with s=0, i≠0, i≠-1, j≠-1:
     after m steps → (i, j+(m-1), k+1). -/
 theorem m_step_mid (v : Vertex m) (hm3 : 3 ≤ m)
@@ -265,18 +286,21 @@ theorem m_step_mid (v : Vertex m) (hm3 : 3 ≤ m)
   simp only [Prod.mk.injEq, true_and, and_true]
   rw [hcast2, natCast_sub_eq_neg m 1 (by omega)]; push_cast; ring
 
+omit [NeZero m] in
 /-- For 0 < i < m-1: after m steps from s=0, k advances by 1. -/
 theorem m_step_k_advance_mid (v : Vertex m) (hm3 : 3 ≤ m)
     (hs : fiber m v = 0) (hi0 : v.1 ≠ 0) (him : v.1 ≠ -1) (hj : v.2.1 ≠ -1) :
     ((step m 0)^[m] v).2.2 = v.2.2 + 1 := by
   rw [m_step_mid m v hm3 hs hi0 him hj]
 
+omit [NeZero m] in
 /-- For 0 < i < m-1: after m steps from s=0, j retreats by 1. -/
 theorem m_step_j_retreat_mid (v : Vertex m) (hm3 : 3 ≤ m)
     (hs : fiber m v = 0) (hi0 : v.1 ≠ 0) (him : v.1 ≠ -1) (hj : v.2.1 ≠ -1) :
     ((step m 0)^[m] v).2.1 = v.2.1 - 1 := by
-  rw [m_step_mid m v hm3 hs hi0 him hj]; simp
-  rw [natCast_sub_eq_neg m 1 (by omega)]; push_cast; ring
+  rw [m_step_mid m v hm3 hs hi0 him hj]
+  change v.2.1 + ↑(m - 1) = v.2.1 - 1
+  rw [natCast_sub_eq_neg m 1 (by omega)]; ring
 
 /-! ## Hamiltonicity of cycle 0
 

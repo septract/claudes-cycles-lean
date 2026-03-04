@@ -10,6 +10,7 @@ namespace ClaudesCycles
 
 variable (m : ℕ) [NeZero m]
 
+omit [NeZero m] in
 /-- Bumping any coordinate increases the fiber by 1. -/
 @[simp]
 theorem fiber_bump (v : Vertex m) (d : Fin 3) :
@@ -17,12 +18,14 @@ theorem fiber_bump (v : Vertex m) (d : Fin 3) :
   simp only [fiber, bump]
   fin_cases d <;> simp [add_comm, add_assoc, add_left_comm]
 
+omit [NeZero m] in
 /-- Stepping any cycle increases the fiber by 1. -/
 @[simp]
 theorem fiber_step (c : Fin 3) (v : Vertex m) :
     fiber m (step m c v) = fiber m v + 1 := by
   simp [step]
 
+omit [NeZero m] in
 /-- At each vertex, the three cycles bump distinct coordinates. -/
 theorem direction_injective (v : Vertex m) :
     Function.Injective (fun c => direction m c v) := by
@@ -31,11 +34,13 @@ theorem direction_injective (v : Vertex m) :
   fin_cases c₁ <;> fin_cases c₂ <;> simp_all <;>
     split_ifs at h <;> simp_all
 
+omit [NeZero m] in
 /-- The direction function at each vertex is a bijection Fin 3 → Fin 3. -/
 theorem direction_bijective (v : Vertex m) :
     Function.Bijective (fun c => direction m c v) :=
   (Finite.injective_iff_bijective).mp (direction_injective m v)
 
+omit [NeZero m] in
 /-- Bumping is injective per coordinate. -/
 theorem bump_injective (d : Fin 3) :
     Function.Injective (fun v : Vertex m => bump m v d) := by
@@ -43,8 +48,9 @@ theorem bump_injective (d : Fin 3) :
   simp only [bump] at h
   fin_cases d <;> simp_all [Prod.mk.injEq]
 
--- Large case split on 3 cycles × fiber regions × direction pairs
 set_option maxHeartbeats 800000 in
+-- 3 cycles × fiber regions × direction pairs = large case split
+omit [NeZero m] in
 /-- step c is injective on Vertex m. The pivot coordinate (preserved by both
   bumps) determines the direction within each fiber region, so different
   directions force a contradiction. -/
