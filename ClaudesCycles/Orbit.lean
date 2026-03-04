@@ -112,4 +112,38 @@ theorem ZMod.orbit_add_two_surj (hm : Odd m) (_hm1 : 1 < m) (x : ZMod m) :
   have hzv : (z.val : ZMod m) = z := ZMod.natCast_zmod_val z
   rw [hzv, h2, add_sub_cancel]
 
+/-! ## Arithmetic helpers for ZMod -/
+
+omit [NeZero m] in
+/-- A nonzero natural number less than m is nonzero in ZMod m. -/
+theorem natCast_ne_zero_of_lt (n : ℕ) (hn0 : 0 < n) (hnm : n < m) :
+    (n : ZMod m) ≠ 0 := by
+  intro h; rw [ZMod.natCast_eq_zero_iff] at h
+  exact absurd (Nat.le_of_dvd hn0 h) (not_le.mpr hnm)
+
+omit [NeZero m] in
+/-- 0 ≠ -1 in ZMod m when m ≥ 2. -/
+theorem zero_ne_neg_one (hm : 2 ≤ m) : (0 : ZMod m) ≠ -1 := by
+  intro h
+  have h1 : (1 : ZMod m) = 0 := by
+    have : (0 : ZMod m) + 1 = (-1 : ZMod m) + 1 := congr_arg (· + 1) h
+    simpa using this
+  have h2 : ((1 : ℕ) : ZMod m) = 0 := by exact_mod_cast h1
+  rw [ZMod.natCast_eq_zero_iff] at h2
+  exact absurd (Nat.le_of_dvd (by omega) h2) (by omega)
+
+omit [NeZero m] in
+/-- -1 ≠ 0 in ZMod m when m ≥ 2. -/
+theorem neg_one_ne_zero (hm : 2 ≤ m) : (-1 : ZMod m) ≠ 0 :=
+  Ne.symm (zero_ne_neg_one m hm)
+
+omit [NeZero m] in
+/-- Cast of (m - k) to ZMod m equals -k when k ≤ m. -/
+theorem natCast_sub_eq_neg (k : ℕ) (hk : k ≤ m) :
+    ((m - k : ℕ) : ZMod m) = -(k : ZMod m) :=
+  eq_neg_of_add_eq_zero_left (by
+    have h : m - k + k = m := Nat.sub_add_cancel hk
+    have : ((m - k + k : ℕ) : ZMod m) = 0 := by rw [h]; exact ZMod.natCast_self m
+    push_cast at this; exact this)
+
 end ClaudesCycles

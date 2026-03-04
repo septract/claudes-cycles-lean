@@ -94,14 +94,6 @@ theorem step_zero_bumps_i (v : Vertex m)
     (step m 0 v).1 = v.1 + 1 := by
   unfold step bump; rw [direction_zero_s0_j_neg m v hs hj]
 
-/-! ## Helper: nonzero cast -/
-
-omit [NeZero m] in
-theorem natCast_ne_zero_of_lt (n : ℕ) (hn0 : 0 < n) (hnm : n < m) :
-    (n : ZMod m) ≠ 0 := by
-  intro h; rw [ZMod.natCast_eq_zero_iff] at h
-  exact absurd (Nat.le_of_dvd hn0 h) (not_le.mpr hnm)
-
 /-! ## i-preservation over m steps -/
 
 omit [NeZero m] in
@@ -192,31 +184,6 @@ theorem iterate_mid (v : Vertex m) (hm3 : 3 ≤ m)
     rw [step_mid m _ hs0' hsm' hi]
     simp only [Prod.mk.injEq, true_and, and_true]
     push_cast; ring
-
-omit [NeZero m] in
-/-- 0 ≠ -1 in ZMod m when m ≥ 2. -/
-theorem zero_ne_neg_one (hm : 2 ≤ m) : (0 : ZMod m) ≠ -1 := by
-  intro h
-  have h1 : (1 : ZMod m) = 0 := by
-    have : (0 : ZMod m) + 1 = (-1 : ZMod m) + 1 := congr_arg (· + 1) h
-    simpa using this
-  have h2 : ((1 : ℕ) : ZMod m) = 0 := by exact_mod_cast h1
-  rw [ZMod.natCast_eq_zero_iff] at h2
-  exact absurd (Nat.le_of_dvd (by omega) h2) (by omega)
-
-omit [NeZero m] in
-/-- -1 ≠ 0 in ZMod m when m ≥ 2. -/
-theorem neg_one_ne_zero (hm : 2 ≤ m) : (-1 : ZMod m) ≠ 0 :=
-  Ne.symm (zero_ne_neg_one m hm)
-
-omit [NeZero m] in
-/-- Cast of (m - k) to ZMod m equals -k when k ≤ m. -/
-theorem natCast_sub_eq_neg (k : ℕ) (hk : k ≤ m) :
-    ((m - k : ℕ) : ZMod m) = -(k : ZMod m) :=
-  eq_neg_of_add_eq_zero_left (by
-    have h : m - k + k = m := Nat.sub_add_cancel hk
-    have : ((m - k + k : ℕ) : ZMod m) = 0 := by rw [h]; exact ZMod.natCast_self m
-    push_cast at this; exact this)
 
 omit [NeZero m] in
 /-- Full m-step formula, i=0 case. From (0, j, k) with s=0, j≠-1:
