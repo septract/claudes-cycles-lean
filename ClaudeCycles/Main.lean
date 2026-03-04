@@ -28,17 +28,17 @@ theorem arcs_partitioned (v : Vertex m) :
     Function.Bijective (fun c : Fin 3 => direction m c v) :=
   direction_bijective m v
 
-/-- Main theorem: for odd m ≥ 3, Claude's construction gives three directed
-    Hamiltonian cycles that partition all 3m³ arcs of the digraph on (Z/mZ)³. -/
+/-- Main theorem: for odd m ≥ 3, the digraph on (Z/mZ)³ with arcs that increment
+    one coordinate can be decomposed into three directed Hamiltonian cycles.
+    The construction (witness) is Claude's direction function, verified by the kernel. -/
 @[tcb] theorem claude_cycles_decomposition (hm : Odd m) (hm3 : 3 ≤ m) :
-    (∀ c : Fin 3, IsHamiltonian m (step m c)) ∧
-    (∀ v : Vertex m, Function.Bijective (fun c : Fin 3 => direction m c v)) := by
-  constructor
-  · intro c
+    ∃ (d : Fin 3 → Vertex m → Fin 3),
+      (∀ v : Vertex m, Function.Bijective (fun c : Fin 3 => d c v)) ∧
+      (∀ c : Fin 3, IsHamiltonian m (fun v => bump m v (d c v))) :=
+  ⟨direction m, direction_bijective m, fun c => by
     fin_cases c
     · exact cycle0_hamiltonian m hm hm3
     · exact cycle1_hamiltonian m hm hm3
-    · exact cycle2_hamiltonian m hm hm3
-  · exact fun v => direction_bijective m v
+    · exact cycle2_hamiltonian m hm hm3⟩
 
 end ClaudeCycles

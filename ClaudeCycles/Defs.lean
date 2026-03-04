@@ -33,7 +33,7 @@ def Vertex.mk' (i j k : ZMod m) : Vertex m := (i, j, k)
   | 2 => (v.1, v.2.1, v.2.2 + 1)
 
 /-- The fiber index s = i + j + k (mod m). -/
-@[tcb] def fiber (v : Vertex m) : ZMod m := v.1 + v.2.1 + v.2.2
+def fiber (v : Vertex m) : ZMod m := v.1 + v.2.1 + v.2.2
 
 /-- The direction function for Claude's cycle decomposition.
   For cycle c at vertex v, returns which coordinate (0, 1, or 2) to bump.
@@ -53,7 +53,7 @@ def Vertex.mk' (i j k : ZMod m) : Vertex m := (i, j, k)
     0 < s < m-1: i ≠ -1 → bump k (2), else bump j (1)
     s = -1:      bump i (0)
 -/
-@[tcb] def direction (c : Fin 3) (v : Vertex m) : Fin 3 :=
+def direction (c : Fin 3) (v : Vertex m) : Fin 3 :=
   let s := fiber m v
   let i := v.1
   let j := v.2.1
@@ -72,7 +72,7 @@ def Vertex.mk' (i j k : ZMod m) : Vertex m := (i, j, k)
     else (if i ≠ -1 then 2 else 1)
 
 /-- Step: follow cycle c one step from vertex v. -/
-@[tcb] def step (c : Fin 3) (v : Vertex m) : Vertex m :=
+def step (c : Fin 3) (v : Vertex m) : Vertex m :=
   bump m v (direction m c v)
 
 end ClaudeCycles
