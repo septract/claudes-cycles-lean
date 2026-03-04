@@ -1,7 +1,7 @@
-name = "ClaudeCycles"
+name = "ClaudesCycles"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["ClaudeCycles"]
+defaultTargets = ["ClaudesCycles"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -20,4 +20,4 @@ git = "https://github.com/OathTech/lean-tcb"
 rev = "main"
 
 [[lean_lib]]
-name = "ClaudeCycles"
+name = "ClaudesCycles"

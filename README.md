@@ -1,4 +1,4 @@
-# ClaudeCycles
+# ClaudesCycles
 
 ## GitHub configuration
 

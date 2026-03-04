@@ -3,10 +3,10 @@
 
 fiber_bump, fiber_step, direction_perm, step_injective.
 -/
-import ClaudeCycles.Defs
+import ClaudesCycles.Defs
 import Mathlib.Data.Fintype.Card
 
-namespace ClaudeCycles
+namespace ClaudesCycles
 
 variable (m : ℕ) [NeZero m]
 
@@ -73,4 +73,4 @@ theorem step_bijective (c : Fin 3) :
 noncomputable def stepEquiv (c : Fin 3) : Equiv.Perm (Vertex m) :=
   Equiv.ofBijective (step m c) (step_bijective m c)
 
-end ClaudeCycles
+end ClaudesCycles

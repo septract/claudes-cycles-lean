@@ -59,7 +59,7 @@ The proof in the paper works fiber-by-fiber. Key observations:
 ## Recommended Formalization Structure
 
 ```
-ClaudeCycles/
+ClaudesCycles/
   Basic.lean          -- ZMod m, vertex type, arc type, digraph definition
   Direction.lean      -- The direction function d and its permutation property
   Fiber.lean          -- Fiber decomposition: s = (i+j+k) mod m, layering lemma

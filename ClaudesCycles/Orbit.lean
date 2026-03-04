@@ -4,12 +4,12 @@
 Shared machinery for proving Hamiltonicity: fiber iteration lemmas,
 the "advance by 2" argument, and the Hamiltonicity criterion.
 -/
-import ClaudeCycles.Basic
+import ClaudesCycles.Basic
 import Mathlib.Dynamics.PeriodicPts.Defs
 import Mathlib.Data.ZMod.Basic
 import Mathlib.GroupTheory.OrderOfElement
 
-namespace ClaudeCycles
+namespace ClaudesCycles
 
 variable (m : ℕ) [NeZero m]
 
@@ -108,4 +108,4 @@ theorem ZMod.orbit_add_two_surj (hm : Odd m) (_hm1 : 1 < m) (x : ZMod m) :
   have hzv : (z.val : ZMod m) = z := ZMod.natCast_zmod_val z
   rw [hzv, h2, add_sub_cancel]
 
-end ClaudeCycles
+end ClaudesCycles

@@ -9,7 +9,7 @@ import Mathlib.Data.Fin.Basic
 import Mathlib.GroupTheory.Perm.Fin
 import LeanTcb
 
-namespace ClaudeCycles
+namespace ClaudesCycles
 
 variable (m : ℕ) [NeZero m]
 
@@ -75,4 +75,4 @@ def direction (c : Fin 3) (v : Vertex m) : Fin 3 :=
 def step (c : Fin 3) (v : Vertex m) : Vertex m :=
   bump m v (direction m c v)
 
-end ClaudeCycles
+end ClaudesCycles

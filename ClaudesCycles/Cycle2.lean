@@ -13,9 +13,9 @@ Proof structure (Knuth's Appendix):
   (4, j, -4-j), ...; the s=0 vertices with j = m-1 are (0, -1, 1),
   (1, -1, 0), (2, -1, -1), .... The "advance by 2" in i holds again.
 -/
-import ClaudeCycles.Orbit
+import ClaudesCycles.Orbit
 
-namespace ClaudeCycles
+namespace ClaudesCycles
 
 variable (m : ℕ) [NeZero m]
 
@@ -67,4 +67,4 @@ theorem cycle2_hamiltonian (hm : Odd m) (hm3 : 3 ≤ m) :
     IsHamiltonian m (step m 2) := by
   sorry
 
-end ClaudeCycles
+end ClaudesCycles

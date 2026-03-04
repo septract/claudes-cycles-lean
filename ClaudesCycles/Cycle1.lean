@@ -11,9 +11,9 @@ Proof structure (Knuth's Appendix):
   (-4, 2+k, 2-k), ... for k = 0, 1, ..., m-1. The "advance by 2" now
   occurs in the i-coordinate. Since gcd(2,m) = 1 for odd m, all values hit.
 -/
-import ClaudeCycles.Orbit
+import ClaudesCycles.Orbit
 
-namespace ClaudeCycles
+namespace ClaudesCycles
 
 variable (m : ℕ) [NeZero m]
 
@@ -62,4 +62,4 @@ theorem cycle1_hamiltonian (hm : Odd m) (hm3 : 3 ≤ m) :
     IsHamiltonian m (step m 1) := by
   sorry
 
-end ClaudeCycles
+end ClaudesCycles

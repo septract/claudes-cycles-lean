@@ -4,12 +4,12 @@
 For all odd m ≥ 3, the digraph on (Z/mZ)³ with arcs that increment one
 coordinate can be decomposed into three directed Hamiltonian cycles.
 -/
-import ClaudeCycles.Cycle0
-import ClaudeCycles.Cycle1
-import ClaudeCycles.Cycle2
+import ClaudesCycles.Cycle0
+import ClaudesCycles.Cycle1
+import ClaudesCycles.Cycle2
 import LeanTcb
 
-namespace ClaudeCycles
+namespace ClaudesCycles
 
 variable (m : ℕ) [NeZero m]
 
@@ -31,7 +31,7 @@ theorem arcs_partitioned (v : Vertex m) :
 /-- Main theorem: for odd m ≥ 3, the digraph on (Z/mZ)³ with arcs that increment
     one coordinate can be decomposed into three directed Hamiltonian cycles.
     The construction (witness) is Claude's direction function, verified by the kernel. -/
-@[tcb] theorem claude_cycles_decomposition (hm : Odd m) (hm3 : 3 ≤ m) :
+@[tcb] theorem claudes_cycles_decomposition (hm : Odd m) (hm3 : 3 ≤ m) :
     ∃ (d : Fin 3 → Vertex m → Fin 3),
       (∀ v : Vertex m, Function.Bijective (fun c : Fin 3 => d c v)) ∧
       (∀ c : Fin 3, IsHamiltonian m (fun v => bump m v (d c v))) :=
@@ -41,4 +41,4 @@ theorem arcs_partitioned (v : Vertex m) :
     · exact cycle1_hamiltonian m hm hm3
     · exact cycle2_hamiltonian m hm hm3⟩
 
-end ClaudeCycles
+end ClaudesCycles

@@ -16,9 +16,9 @@ Proof structure (following Knuth):
   - Between s=0 returns, vertices are distinct (unique fiber assignment).
   - m i-blocks × m² vertices each = m³ total.
 -/
-import ClaudeCycles.Orbit
+import ClaudesCycles.Orbit
 
-namespace ClaudeCycles
+namespace ClaudesCycles
 
 variable (m : ℕ) [NeZero m]
 
@@ -295,4 +295,4 @@ theorem cycle0_hamiltonian (hm : Odd m) (hm3 : 3 ≤ m) :
     IsHamiltonian m (step m 0) := by
   sorry
 
-end ClaudeCycles
+end ClaudesCycles
