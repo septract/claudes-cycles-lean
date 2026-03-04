@@ -14,5 +14,10 @@ name = "mathlib"
 scope = "leanprover-community"
 rev = "v4.28.0"
 
+[[require]]
+name = "lean-tcb"
+git = "https://github.com/OathTech/lean-tcb"
+rev = "main"
+
 [[lean_lib]]
 name = "ClaudeCycles"

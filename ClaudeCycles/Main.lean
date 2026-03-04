@@ -7,6 +7,7 @@ coordinate can be decomposed into three directed Hamiltonian cycles.
 import ClaudeCycles.Cycle0
 import ClaudeCycles.Cycle1
 import ClaudeCycles.Cycle2
+import LeanTcb
 
 namespace ClaudeCycles
 
@@ -29,7 +30,7 @@ theorem arcs_partitioned (v : Vertex m) :
 
 /-- Main theorem: for odd m ≥ 3, Claude's construction gives three directed
     Hamiltonian cycles that partition all 3m³ arcs of the digraph on (Z/mZ)³. -/
-theorem claude_cycles_decomposition (hm : Odd m) (hm3 : 3 ≤ m) :
+@[tcb] theorem claude_cycles_decomposition (hm : Odd m) (hm3 : 3 ≤ m) :
     (∀ c : Fin 3, IsHamiltonian m (step m c)) ∧
     (∀ v : Vertex m, Function.Bijective (fun c : Fin 3 => direction m c v)) := by
   constructor

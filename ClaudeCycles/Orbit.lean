@@ -39,18 +39,36 @@ theorem fiber_eq_of_iterate (c : Fin 3) (v : Vertex m) {a b : ℕ}
 /-- The orbit is Hamiltonian iff it has period m³. Since step c is a bijection,
   this means the permutation has a single cycle. We state it as:
   step c has minimal period m³ at every vertex. -/
-def IsHamiltonian (f : Vertex m → Vertex m) : Prop :=
+@[tcb] def IsHamiltonian (f : Vertex m → Vertex m) : Prop :=
   ∀ v, Function.minimalPeriod f v = m ^ 3
 
 /-- A Hamiltonian function visits all vertices from any starting point. -/
 theorem IsHamiltonian.surj_orbit {f : Vertex m → Vertex m} (hf : IsHamiltonian m f)
-    (hbij : Function.Bijective f) (v : Vertex m) :
+    (_hbij : Function.Bijective f) (v : Vertex m) :
     ∀ w, ∃ n, n < m ^ 3 ∧ f^[n] v = w := by
   intro w
-  -- Since f is bijective and has minimal period m³ at v,
-  -- the orbit of v has exactly m³ elements = |Vertex m|,
-  -- so every vertex is in the orbit.
-  sorry
+  -- The map n ↦ f^[n] v on {0, ..., m^3 - 1} is injective
+  -- (from minimalPeriod = m^3) and maps into Vertex m of size m^3,
+  -- so it's surjective.
+  have hcard : Fintype.card (Vertex m) = m ^ 3 := by
+    simp [Vertex, Fintype.card_prod, ZMod.card]; ring
+  -- Define g : Fin (m^3) → Vertex m by g(n) = f^[n] v
+  have hper := hf v  -- minimalPeriod f v = m ^ 3
+  -- g is injective by iterate_injOn_Iio_minimalPeriod
+  have hinj : Function.Injective (fun n : Fin (m ^ 3) => f^[n.val] v) := by
+    intro ⟨a, ha⟩ ⟨b, hb⟩ heq
+    simp only at heq
+    have := (Function.iterate_eq_iterate_iff_of_lt_minimalPeriod
+      (hper ▸ ha) (hper ▸ hb)).mp heq
+    exact Fin.ext this
+  -- Fin (m^3) and Vertex m have the same cardinality
+  have hcard_eq : Fintype.card (Fin (m ^ 3)) = Fintype.card (Vertex m) := by
+    simp [Fintype.card_fin, hcard]
+  -- Injective on same-size finite type → surjective
+  have hsurj := (Finite.injective_iff_surjective_of_equiv
+    (Fintype.equivOfCardEq hcard_eq)).mp hinj
+  obtain ⟨n, rfl⟩ := hsurj w
+  exact ⟨n.val, n.isLt, rfl⟩
 
 /-- Key arithmetic lemma: in ZMod m with m odd, adding 2 generates all of ZMod m.
   More precisely, the additive order of 2 in ZMod m equals m when m is odd. -/
