@@ -83,7 +83,7 @@ lemma step_mid_phase (hm3 : 3 ≤ m) (v : Vertex m) (hv : fiber m v = 1) :
     intros k hk_lt
     have h_fiber : fiber m ((step m 2)^[k] v) = 1 + k := by
       convert iterate_fiber m 2 v k using 1; aesop
-    constructor <;> intro h <;> simp_all +decide [ ZMod.neg_eq_self_iff ];
+    constructor <;> intro h <;> simp_all +decide;
     · rw [ eq_comm ] at h_fiber;
       norm_cast at h_fiber;
       rw [ ZMod.natCast_eq_zero_iff ] at h_fiber
@@ -106,8 +106,7 @@ lemma step_mid_phase (hm3 : 3 ≤ m) (v : Vertex m) (hv : fiber m v = 1) :
     simp_all +decide [ step ]
     specialize h_fiber_range k ( Nat.lt_of_succ_lt hk_lt )
     simp_all +decide [ fiber, direction ]
-    split_ifs <;> simp_all +decide [ bump ]; ring;
-    ring
+    split_ifs <;> simp_all +decide [ bump ] <;> ring
   rcases m with ( _ | _ | _ | m ) <;> simp_all +decide [ Function.iterate_succ_apply' ];
   split_ifs <;> simp_all +decide [ step ];
   · unfold direction; simp +decide [ *, bump ];
@@ -116,6 +115,7 @@ lemma step_mid_phase (hm3 : 3 ≤ m) (v : Vertex m) (hv : fiber m v = 1) :
   · unfold direction; aesop
 
 set_option maxHeartbeats 800000 in
+-- Aristotle proof: case split + step_mid_phase
 /-- m steps of cycle 2 from fiber 0 corresponds to one application of F. -/
 lemma step_pow_m_eq_F (hm : Odd m) (hm3 : 3 ≤ m) (v : Vertex m) (hv : fiber m v = 0) :
     let v' := (step m 2)^[m] v
@@ -149,10 +149,10 @@ lemma step_pow_m_eq_F (hm : Odd m) (hm3 : 3 ≤ m) (v : Vertex m) (hv : fiber m 
     simp [hvm_step, hvm_dir, bump]
   rcases m with ( _ | _ | m ) <;> simp_all +decide [ Function.iterate_succ_apply' ];
   simp +zetaDelta at *;
-  simp_all +decide [ Function.iterate_succ_apply', F ];
-  split_ifs at * <;> simp_all +decide [ Function.iterate_succ_apply' ];
+  simp_all +decide [ F ];
+  split_ifs at * <;> simp_all +decide;
   all_goals erw [ Function.iterate_succ_apply' ] at *
-  all_goals simp_all +decide [ Function.iterate_succ_apply' ]
+  all_goals simp_all +decide
   · ring
   · ring
   · norm_num at *
@@ -162,9 +162,10 @@ lemma step_pow_m_eq_F (hm : Odd m) (hm3 : 3 ≤ m) (v : Vertex m) (hv : fiber m 
 /-- F iterates through the row (adding 2 to i) for k < m steps when j ≠ -1. -/
 lemma F_iterate_row_ne_neg_one (hm : Odd m) (y : ZMod m) (hy : y ≠ -1) (k : ℕ) (hk : k < m) :
     (F m)^[k] (0, y) = ((2 * k : ZMod m), y) := by
-  induction' k with k ih;
-  · norm_num +zetaDelta at *
-  · rw [ Function.iterate_succ_apply',
+  induction k with
+  | zero => norm_num +zetaDelta at *
+  | succ k ih =>
+    rw [ Function.iterate_succ_apply',
       ih ( Nat.lt_of_succ_lt hk ) ]
     simp +decide [ F, Nat.cast_add ]; ring
     have h_contra :
@@ -179,8 +180,9 @@ lemma F_iterate_row_ne_neg_one (hm : Odd m) (y : ZMod m) (hy : y ≠ -1) (k : �
           h_div ) hk
     grind +ring
 
+omit [NeZero m] in
 /-- F iterates through the row (adding 1 to i) for k < m steps when j = -1. -/
-lemma F_iterate_row_neg_one (hm : Odd m) (k : ℕ) (hk : k < m) :
+lemma F_iterate_row_neg_one (_hm : Odd m) (k : ℕ) (hk : k < m) :
     (F m)^[k] (0, -1) = ((k : ZMod m), -1) := by
   induction k <;> simp_all +decide [ Function.iterate_succ_apply' ];
   rename_i n ih;
@@ -213,22 +215,23 @@ lemma F_pow_m_apply (hm : Odd m) (y : ZMod m) :
           zero_lt_one ) using 1
       norm_num [ Nat.cast_sub <|
         show 1 ≤ m from Nat.pos_of_ne_zero <| NeZero.ne m ]
-    cases m <;> simp_all +decide [ two_mul, sub_add_eq_sub_sub ];
+    cases m <;> simp_all +decide;
     unfold F; aesop
 
 /-- k*m iterations of F starting from (0, y) result in (0, y - 2k). -/
 lemma F_iterate_mul_m_apply (hm : Odd m) (k : ℕ) (y : ZMod m) :
     (F m)^[k * m] (0, y) = (0, y - 2 * k) := by
-  induction' k with k ih generalizing y;
-  · norm_num
-  · rw [ Nat.succ_mul, add_comm, Function.iterate_add_apply, ih ];
+  induction k generalizing y with
+  | zero => norm_num
+  | succ k ih =>
+    rw [ Nat.succ_mul, add_comm, Function.iterate_add_apply, ih ];
     convert F_pow_m_apply m hm ( y - 2 * k ) using 1; push_cast; ring
 
 /-- The minimal period of F starting at (0, y) is m*m. -/
 lemma F_minimalPeriod_zero_fiber (hm : Odd m) (y : ZMod m) :
     Function.minimalPeriod (F m) (0, y) = m * m := by
   have h_iter : (F m)^[m * m] (0, y) = (0, y) := by
-    rw [ F_iterate_mul_m_apply ]; norm_num [ mul_comm ];
+    rw [ F_iterate_mul_m_apply ]; · norm_num [ mul_comm ]
     exact hm
   have h_min_period : ∀ d, 0 < d → d < m * m → (F m)^[d] (0, y) ≠ (0, y) := by
     intro d hd_pos hd_lt
@@ -260,7 +263,7 @@ lemma F_minimalPeriod_zero_fiber (hm : Odd m) (y : ZMod m) :
         generalize_proofs at *; (
         exact h_r_zero hr.2 ( by simpa [ ← ZMod.natCast_eq_natCast_iff ] using h_fr.1 ) ▸ rfl;)
     have h_q_zero : q = 0 := by
-      simp_all +decide [ ZMod.natCast_eq_zero_iff ];
+      simp_all +decide;
       norm_cast at h_fr;
       rw [ ZMod.natCast_eq_zero_iff ] at h_fr
       exact Nat.eq_zero_of_dvd_of_lt
@@ -281,9 +284,10 @@ lemma step_iterate_m_mul_project (hm : Odd m) (hm3 : 3 ≤ m)
     (k : ℕ) (v : Vertex m) (hv : fiber m v = 0) :
     let v' := (step m 2)^[k * m] v
     (v'.1, v'.2.1) = (F m)^[k] (v.1, v.2.1) := by
-  induction' k with k ih generalizing v;
-  · norm_num +zetaDelta at *
-  · have h_step : let v' := (step m 2)^[k * m] v;
+  induction k generalizing v with
+  | zero => norm_num +zetaDelta at *
+  | succ k ih =>
+    have h_step : let v' := (step m 2)^[k * m] v;
       let v'' := (step m 2)^[m] v';
       (v''.1, v''.2.1) = F m (v'.1, v'.2.1) := by
         apply step_pow_m_eq_F m hm hm3;
@@ -355,7 +359,7 @@ lemma cycle2_hamiltonian_fiber_zero (hm : Odd m) (hm3 : 3 ≤ m) (v : Vertex m) 
     Function.minimalPeriod (step m 2) v = m ^ 3 := by
   set P := Function.minimalPeriod (step m 2) v
   have hP_div_m3 : P ∣ m ^ 3 := by
-    refine' Function.IsPeriodicPt.minimalPeriod_dvd _;
+    refine Function.IsPeriodicPt.minimalPeriod_dvd ?_;
     have h_F_m : (F m)^[m ^ 2] (v.1, v.2.1) = (v.1, v.2.1) := by
       have hF_periodic : Function.minimalPeriod (F m) (v.1, v.2.1) = m ^ 2 := by
         convert F_minimalPeriod_univ m hm ( v.1, v.2.1 ) using 1; ring!

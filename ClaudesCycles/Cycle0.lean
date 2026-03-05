@@ -305,6 +305,7 @@ def next_state (v : ZMod m × ZMod m) : ZMod m × ZMod m :=
     else if x = 0 then (0, y - 2)
     else (x, y - 1)
 
+omit [NeZero m] in
 lemma step_generic (v : Vertex m)
     (h1 : fiber m v ≠ 0) (h2 : fiber m v ≠ -1) :
     let v' := step m 0 v
@@ -313,6 +314,7 @@ lemma step_generic (v : Vertex m)
     (v.1 ≠ -1 → v'.2.1 = v.2.1 + 1) := by
       unfold step direction bump; aesop
 
+omit [NeZero m] in
 lemma middle_steps' (hm3 : 3 ≤ m) (v : Vertex m)
     (h_fiber : fiber m v = 1) :
     let v' := (step m 0)^[m - 2] v
@@ -334,7 +336,7 @@ lemma middle_steps' (hm3 : 3 ≤ m) (v : Vertex m)
             fiber m ((step m 0)^[k] v) ≠ 0 ∧
             fiber m ((step m 0)^[k] v) ≠ -1 := by
           constructor <;> intro h <;>
-            simp_all +decide [ add_eq_zero_iff_eq_neg ]
+            simp_all +decide
           · norm_cast at h_fiber_k
             rw [ eq_comm, ZMod.natCast_eq_zero_iff ] at h_fiber_k
             linarith [ Nat.le_of_dvd ( by linarith ) h_fiber_k,
@@ -373,11 +375,12 @@ lemma return_map_eq_model (hm3 : 3 ≤ m) (v : Vertex m) (h : fiber m v = 0) :
         unfold step at *; simp_all +decide [ direction ] ;
         unfold bump at *; simp_all +decide [ fiber ] ;
         rcases m with ( _ | _ | _ | m ) <;> norm_num at *;
-        unfold next_state; simp +decide [ hv1, hv_end ] ;
+        unfold next_state; simp +decide ;
         grind;
       rcases m with ( _ | _ | m ) <;> simp_all +decide [ Function.iterate_add_apply ];
       erw [ Function.iterate_succ_apply' ] ; aesop;
 
+omit [NeZero m] in
 lemma next_state_fst (v : ZMod m × ZMod m) (h : v.2 = -1) :
     (next_state m v).1 = v.1 + 1 := by
       have h_next_state : next_state m v =
@@ -387,6 +390,7 @@ lemma next_state_fst (v : ZMod m × ZMod m) (h : v.2 = -1) :
         unfold next_state; aesop;
       grind
 
+omit [NeZero m] in
 lemma next_state_snd_eq_neg_one (v : ZMod m × ZMod m) (h : v.2 ≠ -1) :
     (next_state m v).1 = v.1 := by
       unfold next_state
@@ -398,6 +402,7 @@ def entry_point (x : ZMod m) : ZMod m :=
   else if x = 0 then -3
   else -2
 
+omit [NeZero m] in
 lemma next_state_entry (x : ZMod m) :
     (next_state m (x, -1)).2 = entry_point m (x + 1) := by
       unfold next_state entry_point;
@@ -447,7 +452,7 @@ lemma column_y_avoid_neg_one (hm : Odd m) (x : ZMod m) (k : ℕ) (hk : k < m - 1
         exact Nat.not_dvd_of_pos_of_lt ( Nat.succ_pos _ )
           ( Nat.lt_pred_iff.mp hk ) h
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 800000 in -- Aristotle proof: case split + column_traversal
 lemma column_traversal (hm : Odd m) (x : ZMod m) :
     let start := entry_point m x
     let delta := column_delta m x
@@ -478,10 +483,11 @@ lemma column_traversal (hm : Odd m) (x : ZMod m) :
       rcases m with ( _ | _ | m ) <;>
         simp_all +decide [ Function.iterate_succ_apply' ]
       · fin_cases x ; trivial;
-      · refine' ⟨ fun k hk => _, _ ⟩;
-        · induction' k with k ih;
-          · norm_num;
-          · rw [ Function.iterate_succ_apply', ih ( by omega ) ];
+      · refine ⟨ fun k hk => ?_, ?_ ⟩;
+        · induction k with
+          | zero => norm_num
+          | succ k ih =>
+            rw [ Function.iterate_succ_apply', ih ( by omega ) ];
             unfold next_state; simp +decide [ *, add_mul, add_assoc ] ;
             split_ifs <;> simp_all +decide [ add_assoc, sub_eq_add_neg ];
             · unfold column_delta; simp +decide ;
@@ -494,7 +500,7 @@ lemma column_traversal (hm : Odd m) (x : ZMod m) :
               exact eq_neg_of_add_eq_zero_left
                 ( by norm_cast; simp +arith +decide ) ]
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 800000 in -- Aristotle proof: case split + column_step
 lemma column_step (hm : Odd m) (x : ZMod m) :
     (next_state m)^[m] (x, entry_point m x) = (x + 1, entry_point m (x + 1)) := by
       have h_col_traversal : ∀ k < m,
@@ -533,10 +539,13 @@ lemma delta_is_unit (hm : Odd m) (x : ZMod m) :
 lemma orbit_formula (hm : Odd m) (i : ℕ) (j : ℕ) (hi : i < m) (hj : j < m) :
     (next_state m)^[i * m + j] (0, entry_point m 0) =
     ((i : ZMod m), entry_point m i + (j : ZMod m) * column_delta m i) := by
-      induction' i with i ih generalizing j;
-      · convert (column_traversal m hm 0).1 j hj using 1 ; aesop;
-        grind;
-      · convert (column_traversal m hm ( i + 1 )).1 j hj using 1;
+      induction i generalizing j with
+      | zero =>
+        convert (column_traversal m hm 0).1 j hj using 1
+        · aesop
+        · grind
+      | succ i ih =>
+        convert (column_traversal m hm ( i + 1 )).1 j hj using 1;
         · convert congr_arg
             ( fun x : ZMod m × ZMod m =>
               ( next_state m )^[j] x )
@@ -552,14 +561,14 @@ lemma orbit_formula (hm : Odd m) (i : ℕ) (j : ℕ) (hi : i < m) (hj : j < m) :
           · norm_num;
         · norm_num
 
-set_option maxHeartbeats 1600000 in
+set_option maxHeartbeats 1600000 in -- Aristotle proof: minimality via orbit_formula
 lemma model_hamiltonian (hm : Odd m) (hm3 : 3 ≤ m) :
     ∀ x : ZMod m × ZMod m, Function.minimalPeriod (next_state m) x = m ^ 2 := by
       have h_start : Function.minimalPeriod (next_state m) (0, entry_point m 0) = m^2 := by
         rw [ Function.minimalPeriod ];
         split_ifs <;> norm_num at *;
         · simp_all +decide [ Nat.find_eq_iff ];
-          refine' ⟨ ⟨ by positivity, _ ⟩, _ ⟩;
+          refine ⟨ ⟨ by positivity, ?_ ⟩, ?_ ⟩;
           · rw [ sq, Function.IsPeriodicPt, Function.IsFixedPt ];
             have h_step : ∀ x : ZMod m,
                 (next_state m)^[m] (x, entry_point m x) =
@@ -622,7 +631,7 @@ lemma model_hamiltonian (hm : Odd m) (hm3 : 3 ≤ m) :
           contrapose! h;
           use m^2;
           simp +decide [ sq, Function.IsPeriodicPt, Function.IsFixedPt ];
-          refine' ⟨ by linarith, _ ⟩;
+          refine ⟨ by linarith, ?_ ⟩;
           have h_step : ∀ x : ZMod m,
               (next_state m)^[m] (x, entry_point m x) =
                 (x + 1, entry_point m (x + 1)) := by
@@ -635,9 +644,10 @@ lemma model_hamiltonian (hm : Odd m) (hm3 : 3 ≤ m) :
                 (next_state m)^[k * m] (x, entry_point m x) =
                   (x + k, entry_point m (x + k)) := by
               intro k
-              induction' k with k ih;
-              · norm_num;
-              · rw [ Nat.succ_mul, add_comm,
+              induction k with
+              | zero => norm_num
+              | succ k ih =>
+                rw [ Nat.succ_mul, add_comm,
                   Function.iterate_add_apply, ih, h_step ]
                 push_cast; ring
             exact h_step_m2 m;
@@ -677,6 +687,7 @@ lemma model_hamiltonian (hm : Odd m) (hm3 : 3 ≤ m) :
         exact ⟨ by positivity, by rw [ ← h_start ] ; exact Function.isPeriodicPt_minimalPeriod _ _ ⟩
       rw [h_period, h_start]
 
+omit [NeZero m] in
 lemma period_scaling {S : Type*} (f : S → S) (fib : S → ZMod m)
     (h_fiber : ∀ x, fib (f x) = fib x + 1) (x : S) :
     Function.minimalPeriod f x = m * Function.minimalPeriod (f^[m]) x := by
@@ -697,19 +708,20 @@ lemma period_scaling {S : Type*} (f : S → S) (fib : S → ZMod m)
             have h_fiber_period :
                 fib (f^[Function.minimalPeriod f x] x) =
                   fib x + Function.minimalPeriod f x := by
-              refine' Nat.recOn
-                ( Function.minimalPeriod f x ) _ _ <;>
+              refine Nat.recOn
+                ( Function.minimalPeriod f x ) ?_ ?_ <;>
                 simp_all +decide
                   [ Function.iterate_succ_apply', add_assoc ]
             simp_all +decide [ ← ZMod.natCast_eq_zero_iff ];
           obtain ⟨ k, hk ⟩ := h_div
           simp_all +decide
-            [ Function.iterate_mul, Function.iterate_fixed ]
+            [ Function.iterate_mul ]
           exact Nat.mul_dvd_mul_left m
             ( Function.IsPeriodicPt.minimalPeriod_dvd
               ( by aesop ) )
       exact Nat.dvd_antisymm h_one_cycle.1 h_one_cycle.2
 
+omit [NeZero m] in
 lemma fiber_zero_determined (v1 v2 : Vertex m)
     (h1 : fiber m v1 = 0) (h2 : fiber m v2 = 0)
     (hx : v1.1 = v2.1) (hy : v1.2.1 = v2.2.1) : v1 = v2 := by
@@ -720,10 +732,12 @@ lemma fiber_zero_determined (v1 v2 : Vertex m)
 def model_to_vertex (x : ZMod m × ZMod m) : Vertex m :=
   (x.1, x.2, -(x.1 + x.2))
 
+omit [NeZero m] in
 lemma model_to_vertex_fiber (x : ZMod m × ZMod m) :
     fiber m (model_to_vertex m x) = 0 := by
       unfold fiber model_to_vertex; ring;
 
+omit [NeZero m] in
 lemma model_to_vertex_inj :
     Function.Injective (model_to_vertex m) := by
       intro x y hxy; simp [model_to_vertex] at hxy; aesop;
@@ -752,14 +766,15 @@ lemma period_conjugacy (hm3 : 3 ≤ m) (x : ZMod m × ZMod m) :
             (step m 0)^[m * n] (model_to_vertex m x) =
               model_to_vertex m ((next_state m)^[n] x) := by
           intro n
-          induction' n with n ih
-          · rfl
-          · rw [ Nat.mul_succ, add_comm,
+          induction n with
+          | zero => rfl
+          | succ n ih =>
+            rw [ Nat.mul_succ, add_comm,
               Function.iterate_add_apply, ih,
               Function.iterate_succ_apply' ]
             exact conjugacy m hm3 ((next_state m)^[n] x);
         simp_all +decide [ Function.iterate_mul, Function.IsFixedPt ];
-        exact ⟨ fun h => by simpa using model_to_vertex_inj m h, fun h => by simpa [ h ] ⟩;
+        exact ⟨ fun h => by simpa using model_to_vertex_inj m h, fun h => by simp [ h ] ⟩;
       · constructor;
         · rintro ⟨ n, hn, hn' ⟩;
           use n;
@@ -778,7 +793,7 @@ lemma period_conjugacy (hm3 : 3 ≤ m) (x : ZMod m × ZMod m) :
                   ( ( next_state m ) ^[ _ ] x ) › ]
             exact conjugacy m hm3 ((next_state m)^[‹ℕ›] x);
           have := h_conj n; simp_all +decide [ Function.IsPeriodicPt, Function.IsFixedPt ] ;
-          have := h_conj n; simp_all +decide [ Function.iterate_mul, Function.iterate_fixed ] ;
+          have := h_conj n; simp_all +decide [ Function.iterate_mul ] ;
           exact model_to_vertex_inj m this.symm;
         · rintro ⟨ k, hk ⟩;
           use k;
@@ -787,12 +802,13 @@ lemma period_conjugacy (hm3 : 3 ≤ m) (x : ZMod m × ZMod m) :
               (step m 0)^[m]^[k] (model_to_vertex m x) =
                 model_to_vertex m
                   ((next_state m)^[k] x) := by
-            refine' Nat.recOn k _ _ <;>
+            refine Nat.recOn k ?_ ?_ <;>
               simp_all +decide
                 [ Function.iterate_succ_apply' ]
             exact fun n _ => conjugacy m hm3 ((next_state m)^[n] x);
           rw [ h_conj, hk.2 ]
 
+omit [NeZero m] in
 lemma exists_model_preimage (v : Vertex m)
     (h : fiber m v = 0) :
     ∃ x : ZMod m × ZMod m, model_to_vertex m x = v := by
@@ -801,7 +817,7 @@ lemma exists_model_preimage (v : Vertex m)
       ext <;> simp_all +decide [ fiber ];
       linear_combination -h
 
-lemma step_period_fiber0 (hm : Odd m) (hm3 : 3 ≤ m)
+lemma step_period_fiber0 (_hm : Odd m) (hm3 : 3 ≤ m)
     (h_model : ∀ x : ZMod m × ZMod m, Function.minimalPeriod (next_state m) x = m ^ 2)
     (u : Vertex m) (hu : fiber m u = 0) :
     Function.minimalPeriod (step m 0) u = m ^ 3 := by
@@ -839,7 +855,7 @@ theorem cycle0_hamiltonian (hm : Odd m) (hm3 : 3 ≤ m) :
           rw [h_eq, hn]
         · intro hn
           apply (step_bijective m 0).injective
-          show f (f^[n] x) = f x
+          change f (f^[n] x) = f x
           rw [← Function.iterate_succ_apply' f n x, Function.iterate_succ_apply f n x]
           exact hn
       exact Nat.dvd_antisymm
