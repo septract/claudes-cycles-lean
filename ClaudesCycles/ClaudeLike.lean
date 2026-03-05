@@ -33,9 +33,11 @@ def IsValidTable (T : ClaudeLikeTable) : Prop :=
   ∀ s_bar i_bar j_bar : Fin 3,
     Function.Bijective (fun c => T c s_bar i_bar j_bar)
 
-/-- A table is generalizable if each cycle is Hamiltonian at m = 3. -/
+/-- A table is generalizable if each cycle is Hamiltonian for all odd m ≥ 3.
+    This matches the paper's definition: a cycle "generalizes" when the lifting
+    procedure yields a Hamiltonian cycle for every odd m. -/
 def IsGeneralizable (T : ClaudeLikeTable) : Prop :=
-  ∀ c : Fin 3, IsHamiltonian 3 (claudeLikeStep T c)
+  ∀ (c : Fin 3) (m : ℕ) [NeZero m], Odd m → 3 ≤ m → IsHamiltonian m (claudeLikeStep T c)
 
 /-! ## Basic lemmas about coarsen -/
 

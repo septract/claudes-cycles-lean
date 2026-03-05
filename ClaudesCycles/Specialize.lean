@@ -58,21 +58,20 @@ theorem step_eq_claudeLikeStep (hm : 2 ≤ m) (c : Fin 3) (v : Vertex m) :
     step m c v = claudeLikeStep claudesTable c v := by
   simp [step, claudeLikeStep, direction_eq_claudeLikeDir m hm]
 
-/-- Claude's table is generalizable: each cycle is Hamiltonian at m = 3.
-    Derived from the existing fully-proved cycle Hamiltonicity theorems. -/
+/-- Claude's table is generalizable: each cycle is Hamiltonian for all odd m ≥ 3.
+    Derived from the concrete Hamiltonicity proofs in Cycle0/1/2.lean. -/
 theorem claudesTable_generalizable : IsGeneralizable claudesTable := by
-  intro c
-  suffices h : claudeLikeStep claudesTable c = step 3 c by
+  intro c m _ hm hm3
+  suffices h : claudeLikeStep claudesTable c = step m c by
     rw [h]
     fin_cases c
-    · exact cycle0_hamiltonian 3 ⟨1, rfl⟩ (by omega)
-    · exact cycle1_hamiltonian 3 ⟨1, rfl⟩ (by omega)
-    · exact cycle2_hamiltonian 3 ⟨1, rfl⟩ (by omega)
+    · exact cycle0_hamiltonian m hm hm3
+    · exact cycle1_hamiltonian m hm hm3
+    · exact cycle2_hamiltonian m hm hm3
   funext v
-  exact (step_eq_claudeLikeStep 3 (by omega) c v).symm
+  exact (step_eq_claudeLikeStep m (by omega) c v).symm
 
-/-- The existing main theorem factors through the general framework
-    (modulo the sorry in claudeLike_generalize). -/
+/-- The existing main theorem factors through the general framework. -/
 theorem claudes_cycles_via_generalize (hm : Odd m) (hm3 : 3 ≤ m) :
     ∃ (d : Fin 3 → Vertex m → Fin 3),
       (∀ v, Function.Bijective (fun c => d c v)) ∧
