@@ -99,14 +99,15 @@ lemma step_mid_phase (hm3 : 3 ≤ m) (v : Vertex m) (hv : fiber m v = 1) :
         (v.1, v.2.1 + if v.1 = -1 then k else 0,
           v.2.2 + if v.1 ≠ -1 then k else 0) := by
     intro k hk_lt
-    induction' k <;>
+    induction k with
+    | zero => simp_all +decide
+    | succ k ih =>
       simp_all +decide [ Function.iterate_succ_apply' ]
-    rename_i k ih
-    specialize ih ( Nat.lt_of_succ_lt hk_lt )
-    simp_all +decide [ step ]
-    specialize h_fiber_range k ( Nat.lt_of_succ_lt hk_lt )
-    simp_all +decide [ fiber, direction ]
-    split_ifs <;> simp_all +decide [ bump ] <;> ring
+      specialize ih ( Nat.lt_of_succ_lt hk_lt )
+      simp_all +decide [ step ]
+      specialize h_fiber_range k ( Nat.lt_of_succ_lt hk_lt )
+      simp_all +decide [ fiber, direction ]
+      split_ifs <;> simp_all +decide [ bump ] <;> ring
   rcases m with ( _ | _ | _ | m ) <;> simp_all +decide [ Function.iterate_succ_apply' ];
   split_ifs <;> simp_all +decide [ step ];
   · unfold direction; simp +decide [ *, bump ];

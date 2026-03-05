@@ -467,10 +467,11 @@ lemma column_traversal (hm : Odd m) (x : ZMod m) :
           let delta := column_delta m x
           (next_state m)^[k] (x, start) = (x, start + k * delta) := by
         intro k hk
-        induction' k with k ih
-        all_goals generalize_proofs at *;
-        · norm_num;
-        · specialize ih ( Nat.lt_of_succ_lt hk )
+        induction k with
+        | zero => generalize_proofs at *; norm_num
+        | succ k ih =>
+          generalize_proofs at *
+          specialize ih ( Nat.lt_of_succ_lt hk )
           simp_all +decide [ Function.iterate_succ_apply' ]
           unfold next_state
           simp +decide [ add_mul, add_assoc ]

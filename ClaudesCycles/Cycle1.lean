@@ -89,7 +89,7 @@ theorem iterate_mid_c1 (v : Vertex m) (hm3 : 3 ≤ m)
     have hs0' : fiber m (v.1 + ↑k, v.2.1, v.2.2) ≠ 0 := by rw [hfib_k]; exact hne0
     have hsm' : fiber m (v.1 + ↑k, v.2.1, v.2.2) ≠ -1 := by rw [hfib_k]; exact hnem
     rw [step_mid_c1 m _ hs0' hsm']
-    simp only [Prod.mk.injEq, true_and, and_true]
+    simp only [Prod.mk.injEq, and_true]
     push_cast; ring
 
 /-! ## m-step formulas for cycle 1
@@ -146,7 +146,7 @@ theorem m_step_c1_eq (v : Vertex m) (hm3 : 3 ≤ m)
   have hne0 : fiber m (v.1 + ↑(m - 2), v.2.1 + 1, v.2.2) ≠ 0 := by
     rw [hfib_last]; exact neg_one_ne_zero m (by omega)
   rw [step, direction_one_sm_i0 m _ hne0 hfib_last hi, bump]
-  simp only [Prod.mk.injEq, true_and, and_true]
+  simp only [Prod.mk.injEq, and_true]
   constructor
   · exact hi
   · ring
@@ -239,7 +239,7 @@ theorem iterate_m_squared_c1 (j : ZMod m) (hm : Odd m) (hm3 : 3 ≤ m) (q : ℕ)
     rw [show m * m * (n + 1) = m * m + m * m * n from by ring,
         Function.iterate_add, Function.comp_apply, ih]
     have h := m_squared_step_c1 m (j + ↑n) hm hm3
-    convert h using 2 <;> push_cast <;> ring
+    convert h using 2; push_cast; ring
 
 omit [NeZero m] in
 /-- Orbit from (0,0,0): after m*(m*q+r) steps (r ≤ m-1),
