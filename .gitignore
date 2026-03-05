@@ -1,3 +1,5 @@
 /.lake
 /.claude/
 /paper/
+/compute/tables_760.json
+__pycache__/
